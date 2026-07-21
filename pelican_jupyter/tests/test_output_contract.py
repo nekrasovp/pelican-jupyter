@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 import nbformat
 import pytest
 
@@ -9,6 +11,7 @@ PNG_1X1 = (
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk"
     "/x8AAusB9Wl2n1cAAAAASUVORK5CYII="
 )
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 @pytest.mark.parametrize(
@@ -105,6 +108,19 @@ def test_committed_output_class_is_preserved(cell, expected):
     assert "jp-" not in fragment.lower()
     assert "<html" not in fragment.lower()
     assert "<body" not in fragment.lower()
+
+
+def test_versioned_representative_fragment_is_exact():
+    notebook = nbformat.read(
+        REPO_ROOT / "examples/visual-review/content/contract-v1.ipynb",
+        as_version=4,
+    )
+    expected = (
+        Path(__file__).parent
+        / "fixtures/nbconvert-basic.v1/representative.fragment.html"
+    ).read_text(encoding="utf-8")
+
+    assert convert_notebook_fragment(notebook) == expected
 
 
 @pytest.mark.parametrize(

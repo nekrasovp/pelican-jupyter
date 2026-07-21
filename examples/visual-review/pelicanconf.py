@@ -1,0 +1,15 @@
+AUTHOR = "Synthetic Fixture"
+DEFAULT_LANG = "en"
+AUTHOR_FEED_ATOM = None
+AUTHOR_FEED_RSS = None
+CATEGORY_FEED_ATOM = None
+FEED_ALL_ATOM = None
+MARKUP = ("ipynb",)
+OUTPUT_PATH = "output"
+PATH = "content"
+PLUGINS = ["pelican.plugins.ipynb_reader"]
+RELATIVE_URLS = True
+SITEURL = ""
+SITENAME = "Notebook Fragment Review"
+TIMEZONE = "UTC"
+TRANSLATION_FEED_ATOM = None

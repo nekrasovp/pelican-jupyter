@@ -34,6 +34,7 @@ setup(
         )
         + find_namespace_packages(include=["pelican.plugins.ipynb_reader*"])
     ),
+    data_files=[("share/doc/pelican-jupyter", ["docs/PROVENANCE.md"])],
     # package_dir={"": "src"},
     zip_safe=False,
     include_package_data=False,

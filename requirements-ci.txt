@@ -1,0 +1,12 @@
+# Exact quality tools shared by minimum and latest-compatible hosted jobs.
+black==26.5.1
+flake8==7.3.0
+flake8-bugbear==25.11.29
+isort==8.0.1
+mypy==2.3.0
+pytest==9.1.1
+pytest-cov==7.1.0
+pyyaml==6.0.3
+setuptools==83.0.0
+setuptools-scm==9.2.2
+wheel==0.47.0

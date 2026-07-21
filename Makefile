@@ -7,7 +7,7 @@ MAKEFLAGS += --no-builtin-rules
 
 TEST_FILTER ?= ""
 TEST_MARKERS ?= ""
-CHECK_PATHS := pelican/plugins/ipynb_reader pelican_jupyter/markup.py pelican_jupyter/tests setup.py
+CHECK_PATHS := ci examples/visual-review/pelicanconf.py pelican/plugins/ipynb_reader pelican_jupyter/markup.py pelican_jupyter/tests setup.py
 
 
 first: help
