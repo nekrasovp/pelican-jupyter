@@ -1,7 +1,6 @@
 import os
 
-from setuptools import find_packages, setup
-
+from setuptools import find_namespace_packages, find_packages, setup
 
 setup_dir = os.path.abspath(os.path.dirname(__file__))
 
@@ -25,16 +24,24 @@ def parse_git(root, **kwargs):
 setup(
     name="pelican-jupyter",
     use_scm_version=True,
-    packages=find_packages(),
+    packages=(
+        find_packages(
+            include=[
+                "pelican_jupyter",
+                "pelican_jupyter.vendor",
+                "pelican_jupyter.vendor.*",
+            ]
+        )
+        + find_namespace_packages(include=["pelican.plugins.ipynb_reader*"])
+    ),
     # package_dir={"": "src"},
     zip_safe=False,
-    include_package_data=True,
+    include_package_data=False,
     # package_data={"pelican_jupyter": ["includes/*"]},
     # data_files=data_files,
     # cmdclass={"install": InstallCmd},
     # entry_points = {},
-    options={"bdist_wheel": {"universal": "1"}},
-    python_requires=">=3.7",
+    python_requires=">=3.10,<3.14",
     setup_requires=["setuptools_scm"],
     install_requires=read_file("requirements.txt").splitlines(),
     extras_require={
@@ -44,7 +51,7 @@ setup(
     description="Pelican plugin for blogging with Jupyter/IPython Notebooks",
     long_description=read_file("README.md"),
     long_description_content_type="text/markdown",
-    license="Apache License, Version 2.0",
+    license="Apache-2.0",
     license_files=("LICENSE.txt",),
     author="Daniel Rodriguez and contributors",
     url="https://github.com/nekrasovp/pelican-jupyter",
@@ -54,9 +61,9 @@ setup(
     },
     keywords=[],
     classifiers=[
-        "License :: OSI Approved :: Apache Software License",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
     ],
 )
