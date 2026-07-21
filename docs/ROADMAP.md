@@ -1,12 +1,11 @@
 # Public roadmap
 
 The successor work is deliberately sequential. A later task waits until its
-dependency is accepted and merged. Issue links will be added to this document as
-the PLUGIN-001 backlog is created.
+dependency is accepted and merged.
 
 ## PLUGIN-001 — successor fork and contract
 
-Status: in progress in the initial draft pull request.
+Status: in progress in [draft PR #1](https://github.com/nekrasovp/pelican-jupyter/pull/1).
 
 Creates the public fork with preserved history and license, freezes the
 first-release contract and legacy inventory, records governance and repository
@@ -22,7 +21,7 @@ Modernize only the direct `.ipynb` plus adjacent `.nbdata` reader to the
 metadata normalization, nbconvert selection, structured failure, and focused
 no-execution coverage. Do not publish a package.
 
-Issue: pending creation in PLUGIN-001.
+Issue: [#2](https://github.com/nekrasovp/pelican-jupyter/issues/2).
 
 ## PLUGIN-003 — CI, compatibility, and release-candidate evidence
 
@@ -33,7 +32,7 @@ fixtures, no-execution sentinel, and representative integration evidence. A
 missing expected notebook must make validation fail even if Pelican exits zero.
 Do not decide or publish the final distribution identity.
 
-Issue: pending creation in PLUGIN-001.
+Issue: [#3](https://github.com/nekrasovp/pelican-jupyter/issues/3).
 
 ## PLUGIN-004 — bounded outreach and identity decision
 
@@ -47,7 +46,7 @@ GitHub and PyPI name availability, then record one identity decision: canonical
 
 No outreach is sent by PLUGIN-001.
 
-Issue: pending creation in PLUGIN-001.
+Issue: [#4](https://github.com/nekrasovp/pelican-jupyter/issues/4).
 
 ## PLUGIN-005 — first supported release
 
@@ -57,4 +56,4 @@ Finalize release documentation, build and inspect distributions, publish through
 the approved identity and trusted mechanism, and verify the immutable public
 release. PLUGIN-005 must not start while distribution identity is unresolved.
 
-Issue: pending creation in PLUGIN-001.
+Issue: [#5](https://github.com/nekrasovp/pelican-jupyter/issues/5).
