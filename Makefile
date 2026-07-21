@@ -7,6 +7,7 @@ MAKEFLAGS += --no-builtin-rules
 
 TEST_FILTER ?= ""
 TEST_MARKERS ?= ""
+CHECK_PATHS := pelican/plugins/ipynb_reader pelican_jupyter/markup.py pelican_jupyter/tests setup.py
 
 
 first: help
@@ -39,14 +40,15 @@ upload-test:  ## Upload package to test PyPI
 # Testing
 
 check:  ## Check linting
-	flake8
-	isort . --check-only --diff --project pelican_jupyter
-	black . --check --diff
+	flake8 $(CHECK_PATHS)
+	isort $(CHECK_PATHS) --check-only --diff --project pelican_jupyter
+	black $(CHECK_PATHS) --check --diff
+	mypy
 
 
 fmt:  ## Format source
-	isort . --project pelican_jupyter
-	black .
+	isort $(CHECK_PATHS) --project pelican_jupyter
+	black $(CHECK_PATHS)
 
 
 test:  ## Run tests

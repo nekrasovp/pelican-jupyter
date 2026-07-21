@@ -1,0 +1,13 @@
+-r requirements.txt
+build
+black
+flake8
+flake8-bugbear
+isort
+mypy
+pytest
+pytest-cov
+setuptools
+setuptools-scm>=8,<10
+twine
+wheel

@@ -1,29 +1,77 @@
+from __future__ import annotations
+
 import os
 import subprocess
+import sys
+import threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 
-import pytest
+SITE = Path(__file__).parent / "pelican" / "markup-nbdata"
 
 
-@pytest.mark.parametrize(
-    "dirname,expected_fname",
-    [
-        ("pelican/liquid", "with-liquid-tag.html"),
-        ("pelican/markup-incell", "md-info-in-cell.html"),
-        ("pelican/markup-nbdata", "nbdata-file.html"),
-    ],
-)
-def test_can_render_notebook(dirname, expected_fname):
-    import shutil
+class _RequestCounter(BaseHTTPRequestHandler):
+    requests = 0
 
-    this_dir = os.path.dirname(os.path.realpath(__file__))
-    pelican_dir = os.path.join(this_dir, dirname)
-    output_dir = os.path.join(pelican_dir, "output")
+    def do_GET(self):
+        type(self).requests += 1
+        self.send_response(204)
+        self.end_headers()
 
-    if os.path.exists(output_dir):
-        shutil.rmtree(output_dir)
+    def log_message(self, _format, *_args):
+        return
 
-    run = subprocess.run(["pelican", "-q"], cwd=pelican_dir)
-    assert run.returncode == 0
 
-    rendered_nb_file = os.path.join(output_dir, expected_fname)
-    assert os.path.exists(rendered_nb_file)
+def test_minimal_pelican_site_builds_both_direct_notebook_routes_without_execution(
+    tmp_path,
+):
+    marker = tmp_path / "build-executed.marker"
+    output = tmp_path / "output"
+    _RequestCounter.requests = 0
+    server = ThreadingHTTPServer(("127.0.0.1", 0), _RequestCounter)
+    server_thread = threading.Thread(target=server.serve_forever, daemon=True)
+    server_thread.start()
+    environment = {
+        **os.environ,
+        "PELICAN_IPYNB_SENTINEL_MARKER": str(marker),
+        "PELICAN_IPYNB_SENTINEL_URL": (
+            f"http://127.0.0.1:{server.server_port}/sentinel"
+        ),
+    }
+
+    try:
+        run = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "pelican",
+                "content",
+                "-s",
+                "pelicanconf.py",
+                "-o",
+                str(output),
+                "--fatal",
+                "errors",
+            ],
+            cwd=SITE,
+            env=environment,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    finally:
+        server.shutdown()
+        server.server_close()
+        server_thread.join(timeout=2)
+
+    assert run.returncode == 0, run.stdout + run.stderr
+    routes = {path.relative_to(output).as_posix() for path in output.rglob("*.html")}
+    assert "articles/synthetic-notebook.html" in routes
+    assert "articles/build-no-execution-sentinel.html" in routes
+    sentinel_html = (
+        output / "articles" / "build-no-execution-sentinel.html"
+    ).read_text(encoding="utf-8")
+    assert "BUILD_SENTINEL_COMMITTED_OUTPUT" in sentinel_html
+    assert "urlopen" in sentinel_html
+    assert not marker.exists()
+    assert _RequestCounter.requests == 0

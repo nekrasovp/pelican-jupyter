@@ -26,10 +26,9 @@ Current public project documents:
 - [repository settings snapshot](docs/REPOSITORY_SNAPSHOT.md);
 - [public roadmap](docs/ROADMAP.md).
 
-No current compatibility or release claim should be inferred from the legacy
-implementation on `main`. Compatibility becomes supported only when the
-contract has executable evidence and a release is published under the identity
-selected by the roadmap.
+The direct reader is being modernized under PLUGIN-002. This repository still
+has no supported successor release: the complete compatibility matrix belongs
+to PLUGIN-003 and publication remains blocked on the later identity decision.
 
 ## First-release direction
 
@@ -42,6 +41,31 @@ self-contained scope for implementation and acceptance.
 Liquid-tag embedding, Python 2, IPython 1.x fallbacks, nbconvert 5, and
 arbitrary historical templates are outside that release. They must not be
 treated as supported merely because their legacy code remains in this fork.
+
+## Direct-reader development interface
+
+The implementation lives at `pelican.plugins.ipynb_reader` and registers an
+`IPYNBReader` through Pelican's `readers_init` signal. During development it can
+be loaded explicitly:
+
+```python
+MARKUP = ("ipynb",)
+PLUGINS = ["pelican.plugins.ipynb_reader"]
+```
+
+For `content/example.ipynb`, create adjacent `content/example.nbdata` metadata:
+
+```text
+Title: Synthetic Notebook
+Date: 2026-07-21
+Slug: synthetic-notebook
+Tags: notebooks, synthetic
+Category: Examples
+```
+
+This is development documentation, not an installation or release claim. The
+reader settings, stable metadata, failure model, and no-execution boundary are
+documented in [the direct-reader contract](docs/DIRECT_READER.md).
 
 ## Historical upstream usage
 
