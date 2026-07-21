@@ -117,8 +117,14 @@ def test_committed_output_class_is_preserved(cell, expected):
         ),
         ("<div class = 'jp-Cell cell'></div>", "jp-*", "markdown"),
         ("<div>missing contract</div>", "required cell", "markdown"),
+        ("<div class='not-cell'></div>", "required cell", "markdown"),
         (
             "<div class='cell'><script>const input_area = true;</script></div>",
+            "required input_area",
+            "code",
+        ),
+        (
+            "<div class='cell not-input_area'></div>",
             "required input_area",
             "code",
         ),
