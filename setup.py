@@ -45,9 +45,13 @@ setup(
     long_description=read_file("README.md"),
     long_description_content_type="text/markdown",
     license="Apache License, Version 2.0",
-    maintainer="Daniel Rodriguez",
-    maintainer_email="daniel@danielfrg.com",
-    url="https://github.com/danielfrg/pelican-jupyter",
+    license_files=("LICENSE.txt",),
+    author="Daniel Rodriguez and contributors",
+    url="https://github.com/nekrasovp/pelican-jupyter",
+    project_urls={
+        "Source": "https://github.com/nekrasovp/pelican-jupyter",
+        "Upstream": "https://github.com/danielfrg/pelican-jupyter",
+    },
     keywords=[],
     classifiers=[
         "License :: OSI Approved :: Apache Software License",
