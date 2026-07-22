@@ -7,16 +7,24 @@ is not endorsed by the upstream author or the Pelican project.
 
 ## Project status
 
-The fork has a modernized direct reader and is collecting PLUGIN-003
-release-candidate evidence. It has **not** published a successor release and is
-**not release-ready**. The `pelican-jupyter` name on PyPI remains an existing
-historical distribution; this repository does not claim ownership of it or
-access to publish it.
+The fork has a modernized direct reader and accepted PLUGIN-003
+release-candidate evidence. It is the temporary working successor fork for
+development and end-to-end plugin/site/theme validation. It has **not**
+published a successor release and is **not release-ready**. The
+`pelican-jupyter` name on PyPI remains an existing historical distribution;
+this repository does not claim ownership of it or access to publish it.
 
-The provisional GitHub repository identity is
+The temporary development repository is
 [`nekrasovp/pelican-jupyter`](https://github.com/nekrasovp/pelican-jupyter).
-The distribution identity will be decided only after the bounded identity work
-described in the [public roadmap](docs/ROADMAP.md).
+Outreach and the final distribution identity are deferred until the combined
+plugin/site/theme path passes end-to-end validation and a new explicit user
+decision resumes that work. See the
+[fork-first decision](docs/decisions/0001-fork-first-development-identity.md)
+and [public roadmap](docs/ROADMAP.md).
+
+During validation, downstream consumers may integrate only an immutable fork
+commit or an artifact tied to one, with the commit and artifact integrity
+verified. This is a development integration path, not a public release.
 
 Current public project documents:
 
@@ -28,11 +36,11 @@ Current public project documents:
 - [PLUGIN-003 release-candidate evidence](docs/RELEASE_CANDIDATE.md);
 - [public roadmap](docs/ROADMAP.md).
 
-The PLUGIN-002 direct reader is merged. PLUGIN-003 adds an independent
+The PLUGIN-002 direct reader is merged. PLUGIN-003 added an independent
 publication-completeness gate, hosted compatibility matrix, synthetic
 fixtures, artifact inspection, and external 11-notebook evidence. These are
-candidate checks, not a supported successor release; publication remains
-blocked on the later identity decision.
+candidate checks, not a supported successor release; public release remains
+blocked on the later identity decision and separate publication authorization.
 
 ## First-release direction
 
