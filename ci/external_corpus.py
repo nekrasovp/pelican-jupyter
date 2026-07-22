@@ -15,6 +15,20 @@ from pathlib import Path
 from typing import Sequence
 
 
+def _resolve_python(executable: str, *, invocation_root: Path | None = None) -> str:
+    """Resolve the runtime before any subprocess changes its working directory."""
+    root = Path.cwd() if invocation_root is None else invocation_root
+    path = Path(executable)
+    if not path.is_absolute():
+        path = root / path
+    absolute = Path(os.path.abspath(path))
+    if not absolute.exists():
+        raise RuntimeError(f"Python executable is unavailable: {executable}")
+    if not absolute.is_file():
+        raise RuntimeError(f"Python executable is not a file: {executable}")
+    return str(absolute)
+
+
 def _run(
     command: list[str], *, cwd: Path, environment=None
 ) -> subprocess.CompletedProcess:
@@ -198,7 +212,9 @@ def _metadata_observations(evidence: dict, owner: str) -> dict:
 
 
 def run(args) -> dict:
+    args.python = _resolve_python(args.python)
     site_root = args.site_root.resolve()
+    args.site_root = site_root
     args.expected_manifest = args.expected_manifest.resolve()
     args.baseline_metadata = args.baseline_metadata.resolve()
     work_root = args.work_root.resolve()

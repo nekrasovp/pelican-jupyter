@@ -11,6 +11,7 @@ WORKFLOW = Path(".github/workflows/test.yml")
 FULL_COMMIT = re.compile(r"^[0-9a-f]{40}$")
 REQUIRED_PYTHONS = {"3.10", "3.11", "3.12", "3.13"}
 ALLOWED_ACTIONS = {"actions/checkout", "actions/setup-python"}
+PLUGIN_HEAD = "${{ github.event.pull_request.head.sha || github.sha }}"
 
 
 def _fail(message: str) -> None:
@@ -70,6 +71,17 @@ def main() -> None:
             and inputs.get("persist-credentials") is not False
         ):
             _fail("every checkout must set persist-credentials: false")
+        if (
+            action == "actions/checkout"
+            and "repository" not in inputs
+            and inputs.get("ref") != PLUGIN_HEAD
+        ):
+            _fail("plugin checkout must use the exact PR head or event SHA")
+
+    if workflow.get("env", {}).get("EXPECTED_HEAD") != PLUGIN_HEAD:
+        _fail("EXPECTED_HEAD must identify the exact PR head or event SHA")
+    if raw.count('test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"') != 2:
+        _fail("every plugin job must assert its checked-out source head")
 
     for version in REQUIRED_PYTHONS:
         if version not in raw:

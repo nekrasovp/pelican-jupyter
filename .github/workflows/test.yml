@@ -13,6 +13,9 @@ concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+
 jobs:
   compatibility:
     name: ${{ matrix.name }}
@@ -50,6 +53,7 @@ jobs:
       - name: Check out plugin source
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -69,6 +73,8 @@ jobs:
 
       - name: Print exact resolved versions
         run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          echo "plugin head=$EXPECTED_HEAD"
           python --version
           python -m pip --version
           python - <<'PY'
@@ -110,6 +116,7 @@ jobs:
       - name: Check out plugin source
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -127,6 +134,8 @@ jobs:
 
       - name: Print exact RC environment
         run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          echo "plugin head=$EXPECTED_HEAD"
           python --version
           python -m pip --version
           python - <<'PY'
@@ -193,7 +202,8 @@ jobs:
 
       - name: Build and gate the external corpus twice
         run: |
-          external-site/.venv/bin/python ci/external_corpus.py \
+          "$GITHUB_WORKSPACE/external-site/.venv/bin/python" \
+            ci/external_corpus.py \
             --site-root external-site \
             --external-commit "$EXTERNAL_COMMIT" \
             --expected-manifest \
@@ -202,7 +212,7 @@ jobs:
               external-site/migration/production_parity/baseline/metadata.json \
             --work-root "$RUNNER_TEMP/external-integration" \
             --report-out "$RUNNER_TEMP/external-report.json" \
-            --python external-site/.venv/bin/python \
+            --python "$GITHUB_WORKSPACE/external-site/.venv/bin/python" \
             --expected-articles 46 \
             --expected-notebooks 11 \
             --expected-missing-alt 57 \
