@@ -145,13 +145,13 @@ but its presence does not make it supported.
 
 ## Distribution identity
 
-The development repository is provisionally `nekrasovp/pelican-jupyter`.
-PLUGIN-004 must decide the distribution identity before PLUGIN-005 can publish:
+The temporary working successor fork is `nekrasovp/pelican-jupyter`.
+[ADR 0001](decisions/0001-fork-first-development-identity.md) keeps that
+repository and the current package/import compatibility names unchanged for
+development and end-to-end plugin/site/theme validation. This does not select
+the final distribution identity.
 
-- canonical `pelican-jupyter` only with explicit maintainer and PyPI access;
-- preferred independent `pelican-ipynb-reader` after a fresh availability
-  check; or
-- a `pelican-plugins` identity only after explicit organizational acceptance.
-
-This contract makes no PyPI ownership, release-readiness, upstream endorsement,
-or published-package claim.
+Outreach and the final identity decision resume only after that validation and
+a new explicit user decision. Public release remains blocked until the identity
+and publication gates are separately satisfied. This contract makes no PyPI
+ownership, release-readiness, upstream endorsement, or published-package claim.

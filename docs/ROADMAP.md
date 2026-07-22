@@ -34,23 +34,28 @@ Do not decide or publish the final distribution identity.
 
 Issue: [#3](https://github.com/nekrasovp/pelican-jupyter/issues/3).
 
-## PLUGIN-004 — bounded outreach and identity decision
+## PLUGIN-004 — fork-first development decision
 
 Depends on: accepted PLUGIN-003 release-candidate evidence.
 
-After separate authorization, send at most one bounded outreach message and
-observe a 10-14 calendar-day response window without repeated polling. Re-check
-GitHub and PyPI name availability, then record one identity decision: canonical
-`pelican-jupyter` only with explicit access, preferred independent
-`pelican-ipynb-reader`, or `pelican-plugins` only on explicit acceptance.
+Use `nekrasovp/pelican-jupyter` as the temporary working successor fork for
+development and end-to-end plugin/site/theme validation. Outreach and the final
+distribution identity are deferred until that validation is complete and a new
+explicit user decision resumes the work. Do not rename the repository/package,
+change imports or compatibility, or create a public release in this task.
 
-No outreach is sent by PLUGIN-001.
+Downstream validation may use only an immutable fork commit or a
+commit-derived artifact with verified integrity. The
+[fork-first decision](decisions/0001-fork-first-development-identity.md) records
+the boundary. Issue #4 remains open and deferred; this decision does not close
+it. Outbound count and package-publication count remain zero.
 
 Issue: [#4](https://github.com/nekrasovp/pelican-jupyter/issues/4).
 
 ## PLUGIN-005 — first supported release
 
-Depends on: completed PLUGIN-004 identity decision.
+Depends on: resumed and completed final distribution-identity decision after
+end-to-end validation.
 
 Finalize release documentation, build and inspect distributions, publish through
 the approved identity and trusted mechanism, and verify the immutable public

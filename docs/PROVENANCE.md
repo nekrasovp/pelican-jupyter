@@ -27,17 +27,16 @@ The archived upstream author and the Pelican project have not endorsed this
 fork. No repository, organization, or package ownership beyond the visible
 GitHub fork relationship should be inferred.
 
-The repository identity `nekrasovp/pelican-jupyter` is provisional. The final
-distribution identity remains unresolved until PLUGIN-004:
+The repository identity `nekrasovp/pelican-jupyter` is the temporary working
+successor fork for development and end-to-end plugin/site/theme validation.
+[ADR 0001](decisions/0001-fork-first-development-identity.md) defers outreach
+and the final distribution identity until that validation is complete and a
+new explicit user decision resumes the work. The repository/package names,
+import paths, and compatibility behavior are unchanged by that decision.
 
-- use the canonical `pelican-jupyter` distribution only if explicit maintainer
-  and PyPI access are confirmed;
-- otherwise prefer the independent working name `pelican-ipynb-reader`, after a
-  fresh availability check;
-- use a `pelican-plugins` home only if that organization explicitly accepts the
-  project and its governance boundary.
-
-No package publication, transfer, or outreach occurred in PLUGIN-001.
+No package ownership, publication permission, upstream endorsement, or
+organization acceptance is inferred. No package publication, transfer, or
+outreach has occurred in this successor project.
 
 ## License and attribution
 
