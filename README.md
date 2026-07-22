@@ -7,10 +7,11 @@ is not endorsed by the upstream author or the Pelican project.
 
 ## Project status
 
-The fork is in its contract-first phase. It has **not** published a successor
-release and is **not release-ready**. The `pelican-jupyter` name on PyPI remains
-an existing historical distribution; this repository does not claim ownership
-of it or access to publish it.
+The fork has a modernized direct reader and is collecting PLUGIN-003
+release-candidate evidence. It has **not** published a successor release and is
+**not release-ready**. The `pelican-jupyter` name on PyPI remains an existing
+historical distribution; this repository does not claim ownership of it or
+access to publish it.
 
 The provisional GitHub repository identity is
 [`nekrasovp/pelican-jupyter`](https://github.com/nekrasovp/pelican-jupyter).
@@ -24,11 +25,14 @@ Current public project documents:
 - [legacy-feature inventory](docs/LEGACY_FEATURE_INVENTORY.md);
 - [governance](GOVERNANCE.md) and [contribution boundary](CONTRIBUTING.md);
 - [repository settings snapshot](docs/REPOSITORY_SNAPSHOT.md);
+- [PLUGIN-003 release-candidate evidence](docs/RELEASE_CANDIDATE.md);
 - [public roadmap](docs/ROADMAP.md).
 
-The direct reader is being modernized under PLUGIN-002. This repository still
-has no supported successor release: the complete compatibility matrix belongs
-to PLUGIN-003 and publication remains blocked on the later identity decision.
+The PLUGIN-002 direct reader is merged. PLUGIN-003 adds an independent
+publication-completeness gate, hosted compatibility matrix, synthetic
+fixtures, artifact inspection, and external 11-notebook evidence. These are
+candidate checks, not a supported successor release; publication remains
+blocked on the later identity decision.
 
 ## First-release direction
 

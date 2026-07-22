@@ -1,60 +1,229 @@
-name: test
+name: CI
 
 on:
   push:
     branches: [main]
   pull_request:
-  schedule:
-    - cron: "0 5 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  EXPECTED_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+
 jobs:
-  test:
-    runs-on: ubuntu-20.04
-
+  compatibility:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
-
+        include:
+          - name: Python 3.10 / declared minimum
+            python-version: "3.10"
+            requirements: requirements-min.txt
+            constraints: ""
+          - name: Python 3.10 / latest compatible
+            python-version: "3.10"
+            requirements: requirements.txt
+            constraints: ""
+          - name: Python 3.11 / latest compatible
+            python-version: "3.11"
+            requirements: requirements.txt
+            constraints: ""
+          - name: Python 3.12 / current lock
+            python-version: "3.12"
+            requirements: requirements-dev.lock.txt
+            constraints: ""
+          - name: Python 3.13 / latest compatible
+            python-version: "3.13"
+            requirements: requirements.txt
+            constraints: ""
+          - name: Python 3.13 / Pelican 4.12
+            python-version: "3.13"
+            requirements: requirements.txt
+            constraints: -c ci/constraints-pelican412.txt
     steps:
-    - uses: actions/checkout@v2
-    - run: git fetch --prune --unshallow
+      - name: Check out plugin source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
 
-    - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Print Python versions
-      run: |
-        which python
-        which pip
-        python --version
-        pip --version
+      - name: Install committed dependency inputs
+        run: |
+          python -m pip install --disable-pip-version-check \
+            -r "${{ matrix.requirements }}" \
+            -r requirements-ci.txt \
+            ${{ matrix.constraints }}
+          python -m pip install --disable-pip-version-check \
+            --no-build-isolation --no-deps -e .
 
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip --version
-        pip install -U pytest pytest-cov
-        pip freeze
+      - name: Print exact resolved versions
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          echo "plugin head=$EXPECTED_HEAD"
+          python --version
+          python -m pip --version
+          python - <<'PY'
+          from importlib.metadata import version
 
-    - name: Build package
-      run: |
-        make build
+          for name in (
+              "pelican",
+              "nbconvert",
+              "nbformat",
+              "jinja2",
+              "markdown",
+              "pytest",
+              "black",
+              "flake8",
+              "mypy",
+          ):
+              print(f"{name}=={version(name)}")
+          PY
+          python -m pip freeze | LC_ALL=C sort
 
-    - name: Install package
-      run: |
-        pip install dist/*.tar.gz
-        pip freeze
+      - name: Run full tests and repository checks
+        run: |
+          python -m pytest
+          make check
+          python ci/check_no_execution.py
+          python ci/check_scope.py
+          python ci/check_workflow.py
+          git diff --check
+          git diff --exit-code
 
-    - name: Run tests
-      run: |
-        make test
-        make report
+  release-candidate:
+    name: RC artifacts and external 11-notebook corpus
+    needs: compatibility
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      EXTERNAL_COMMIT: cac7d59b7a691ebdedea17f5978ce24693830bf8
+    steps:
+      - name: Check out plugin source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
 
-    - name: Codecov
-      uses: codecov/codecov-action@v1
-      with:
-        file: ./coverage.xml
+      - name: Set up current Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.12"
 
+      - name: Install committed current lock
+        run: |
+          python -m pip install --disable-pip-version-check \
+            -r requirements-dev.lock.txt
+          python -m pip install --disable-pip-version-check \
+            --no-build-isolation --no-deps -e .
+
+      - name: Print exact RC environment
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          echo "plugin head=$EXPECTED_HEAD"
+          python --version
+          python -m pip --version
+          python - <<'PY'
+          from importlib.metadata import version
+
+          for name in (
+              "pelican",
+              "nbconvert",
+              "nbformat",
+              "jinja2",
+              "markdown",
+              "build",
+              "setuptools",
+              "setuptools-scm",
+              "twine",
+              "uv",
+          ):
+              print(f"{name}=={version(name)}")
+          PY
+          python -m pip freeze | LC_ALL=C sort
+
+      - name: Build and inspect the RC wheel and sdist once
+        run: |
+          python -m pytest
+          make check
+          python ci/check_no_execution.py
+          python ci/check_scope.py
+          python ci/check_workflow.py
+          git diff --check
+          python -m build --no-isolation --wheel --sdist \
+            --outdir "$RUNNER_TEMP/rc-dist"
+          python -m twine check "$RUNNER_TEMP"/rc-dist/*
+          python ci/verify_artifacts.py \
+            --dist "$RUNNER_TEMP/rc-dist" \
+            --requirements requirements.txt \
+            --work-root "$RUNNER_TEMP/artifact-installs" \
+            --report-out "$RUNNER_TEMP/artifact-report.json"
+          cat "$RUNNER_TEMP/artifact-report.json"
+          git diff --exit-code
+
+      - name: Check out the exact external public corpus
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          repository: nekrasovp/nekrasovp.github.io
+          ref: cac7d59b7a691ebdedea17f5978ce24693830bf8
+          path: external-site
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Install the RC wheel into the external runtime
+        run: |
+          uv sync --project external-site --locked --all-groups
+          uv pip install \
+            --python external-site/.venv/bin/python \
+            --no-deps --force-reinstall "$RUNNER_TEMP"/rc-dist/*.whl
+          external-site/.venv/bin/python -I - <<'PY'
+          from pathlib import Path
+          import pelican.plugins.ipynb_reader as reader
+
+          path = Path(reader.__file__).resolve().as_posix()
+          assert "site-packages" in path, path
+          print(f"external reader artifact={path}")
+          PY
+
+      - name: Build and gate the external corpus twice
+        run: |
+          "$GITHUB_WORKSPACE/external-site/.venv/bin/python" \
+            ci/external_corpus.py \
+            --site-root external-site \
+            --external-commit "$EXTERNAL_COMMIT" \
+            --expected-manifest \
+              external-site/migration/production_parity/inputs/legacy_routes.tsv \
+            --baseline-metadata \
+              external-site/migration/production_parity/baseline/metadata.json \
+            --work-root "$RUNNER_TEMP/external-integration" \
+            --report-out "$RUNNER_TEMP/external-report.json" \
+            --python "$GITHUB_WORKSPACE/external-site/.venv/bin/python" \
+            --expected-articles 46 \
+            --expected-notebooks 11 \
+            --expected-missing-alt 57 \
+            --expected-empty-alt 2 \
+            --expected-title-gaps 8 \
+            --expected-reader-language-absent 11 \
+            --expected-rendered-language-gaps 1 \
+            --metadata-gap-owner SITE-003 \
+            --timezone Europe/Moscow
+          cat "$RUNNER_TEMP/external-report.json"
+          test -z "$(git -C external-site status --porcelain)"
+          test "$(git -C external-site rev-parse HEAD)" = "$EXTERNAL_COMMIT"
+          git diff --check
+          git diff --exit-code

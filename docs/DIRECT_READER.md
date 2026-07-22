@@ -76,7 +76,7 @@ sentinels contain code that would create a marker and make a network request;
 tests observe that neither side effect occurs and that committed output and
 source bytes remain unchanged.
 
-## Structured failures and PLUGIN-003 boundary
+## Structured failures and publication verification
 
 All `read()` failures derive from `NotebookReaderError` and expose
 `source_path`, `stage`, `category`, `cause_type`, and `cause_message`. Concrete
@@ -84,10 +84,13 @@ types cover metadata discovery, metadata parsing, validation, notebook parsing,
 conversion, and copy. When an underlying exception exists it is retained via
 exception chaining.
 
-`NotebookPublicationError` reserves the same structure for publication-facing
-omissions, but PLUGIN-002 does not add process-global collection or a route
-verification CLI. The independent expected-source/expected-route gate and the
-full hosted compatibility matrix remain exclusively PLUGIN-003 work.
+`NotebookPublicationError` provides the same structure for
+publication-facing omissions. The instance-local
+`pelican.plugins.ipynb_reader.publication` CLI independently compares a
+publisher-owned expected source/route manifest and metadata baseline with one
+completed output tree. It returns non-zero for a missing source or route even
+when Pelican returned zero. The plugin does not retain process-global build
+state and does not vendor a publisher's manifest.
 
 ## Dependency policy
 
@@ -96,6 +99,7 @@ The runtime policy is Python `>=3.10,<3.14`, Pelican `>=4.10.2,<5`, nbconvert
 `>=3.1.4,<4`. `requirements-min.txt` records the exact direct floors used for
 the local minimum smoke. `requirements-dev.lock.txt` records the resolved
 current development environment and is installed with
-`uv pip install -r requirements-dev.lock.txt`. PLUGIN-003 owns the full
-cross-version matrix and may
-narrow these provisional ranges when repeatable evidence requires it.
+`uv pip install -r requirements-dev.lock.txt`. The hosted matrix and
+release-candidate evidence are recorded in
+[the PLUGIN-003 report](RELEASE_CANDIDATE.md). It may narrow these provisional
+ranges only when repeatable evidence and the decision are documented.

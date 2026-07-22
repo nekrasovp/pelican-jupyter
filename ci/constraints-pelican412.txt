@@ -1,0 +1,2 @@
+# Explicit Pelican 4.12 matrix exercise independent of the current lock.
+pelican==4.12.0

@@ -169,6 +169,8 @@ python-dateutil==2.9.0.post0
     #   pelican
 pytokens==0.4.1
     # via black
+pyyaml==6.0.3
+    # via -r requirements-dev.in
 pyzmq==27.1.0
     # via jupyter-client
 readme-renderer==45.0
@@ -230,6 +232,8 @@ urllib3==2.7.0
     #   id
     #   requests
     #   twine
+uv==0.11.30
+    # via -r requirements-dev.in
 watchfiles==1.2.0
     # via pelican
 webencodings==0.5.1

@@ -8,7 +8,9 @@ isort
 mypy
 pytest
 pytest-cov
+pyyaml
 setuptools
 setuptools-scm>=8,<10
 twine
+uv
 wheel
